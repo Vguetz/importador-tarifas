@@ -50,7 +50,6 @@
     </form>
 
     <hr style="margin: 40px 0;">
-
     <h2>Consultar Productos</h2>
 
     <form id="formConsulta">
