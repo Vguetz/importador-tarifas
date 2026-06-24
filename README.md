@@ -7,13 +7,13 @@ Clonar el repo, entrar a la carpeta y desde ahí:
 - `composer install` para instalar las dependencias.
 - Copiar el `.env.example` a `.env` y completar los datos de la base.
 - `php artisan migrate` para correr las migraciones.
+- `php artisan db:seed` para crear los proveedores base.
 - `php artisan serve` para levantar el servidor.
 
 Si lo querés probar por consola, hay un comando para eso:
 
 ```
 php artisan importar:excel {archivo} {codigo} {id}
-
 Ejemplo: php artisan importar:excel PROVEEDOR_A.xlsx lucgom_global 1   
 ```
 
@@ -54,3 +54,4 @@ Con más tiempo, seguiría por acá:
 - **Validación de esquema.** Por ahora confío en que el Excel trae las columnas esperadas. Estaría bueno validar la estructura apenas llega el archivo y devolver un error claro si no respeta el formato, antes de insertar nada.
 - **Búsqueda indexada.** Si el catálogo crece a millones de registros, las consultas con `WHERE` van a empezar a ser bastante mas lentas. Ahí integraría un motor de búsqueda indexado por atras, manteniendo el endpoint actual pero bajando los tiempos de respuesta.
 - **Mejor trazabilidad.** Que si falla una fila dentro de un archivo de 10.000, quede registrado el motivo exacto y el proceso continúe con el resto, en lugar de abortar por completo.
+- **Alta automática de proveedores en la importación.**. Hoy el proveedor tiene que existir antes de importar (se pasa su id y se valida contra la base). Me hubiera gustado que la importación pudiera crear el proveedor automáticamente si no existe, derivándolo del código de configuración, de forma que dar de alta un proveedor nuevo fuera simplemente agregar su bloque al config y tirar el Excel, sin pasos manuales previos. No lo incluí porque, en un escenario real, el alta de un proveedor suele ser un acto deliberado con más datos asociados y conviene separarla del flujo de importación, resolver bien ese equilibrio hubiese requerido mas tiempo.

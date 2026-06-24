@@ -35,6 +35,7 @@
             <select name="codigo_proveedor" id="codigo_proveedor" required>
                 <option value="lucgom_global">LucGomGlobal (lucgom_global)</option>
                 <option value="industrial_parts">IndustrialParts (industrial_parts)</option>
+                <option value="proveedor_c">Global Logistics C (proveedor_c)</option>
             </select>
         </div>
         <br>

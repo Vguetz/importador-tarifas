@@ -13,58 +13,58 @@ class ImportacionService
     public function procesarArchivo($rutaArchivo, $codigoProveedor, $proveedorId)
     {
         $config = Config::get("proveedores.{$codigoProveedor}");
-        $reglas = $config['reglas'] ?? [];
 
         if (!$config) {
             throw new \Exception("no se encontro la configuracion para el proveedor: {$codigoProveedor}");
         }
 
-        $mapeo = $config['columnas'];
+        $reglas = $config['reglas'] ?? [];
+        $mapeo  = $config['columnas'];
 
         (new FastExcel)->import($rutaArchivo, function ($fila) use ($mapeo, $config, $proveedorId, $reglas) {
-            
-            $referencia = $fila[$mapeo['referencia']] ?? null;
+
+            $referencia = $this->valor($fila, $mapeo, 'referencia');
             if (!$referencia) {
-                return; 
+                return;
             }
 
             $producto = Producto::updateOrCreate(
                 [
-                    'proveedor_id' => $proveedorId, 
+                    'proveedor_id'         => $proveedorId,
                     'referencia_proveedor' => $referencia
                 ],
                 [
-                    'marca'       => $fila[$mapeo['marca']] ?? 'Genérica',
-                    'codigo_ean'  => $fila[$mapeo['codigo_ean']] ?? null,
-                    'descripcion' => $fila[$mapeo['descripcion']] ?? null,
-                    'dimensiones' => $fila[$mapeo['dimensiones']] ?? null,
-                    'familia'     => $fila[$mapeo['familia']] ?? null,
-                    'subfamilia'  => $fila[$mapeo['subfamilia']] ?? null,
+                    'marca'       => $this->valor($fila, $mapeo, 'marca', 'Genérica'),
+                    'codigo_ean'  => $this->valor($fila, $mapeo, 'codigo_ean'),
+                    'descripcion' => $this->valor($fila, $mapeo, 'descripcion'),
+                    'dimensiones' => $this->valor($fila, $mapeo, 'dimensiones'),
+                    'familia'     => $this->valor($fila, $mapeo, 'familia'),
+                    'subfamilia'  => $this->valor($fila, $mapeo, 'subfamilia'),
                 ]
             );
 
-        
             if (isset($config['tramos_precio'])) {
                 foreach ($config['tramos_precio'] as $cantidadMinima => $columnaPrecio) {
                     $precioCrudo = $fila[$columnaPrecio] ?? null;
                     if ($precioCrudo !== null && $precioCrudo !== '') {
-                        $this->registrarPrecioYTramos($producto->id, $cantidadMinima, $precioCrudo, $reglas);   
+                        $this->registrarPrecioYTramos($producto->id, $cantidadMinima, $precioCrudo, $reglas);
                     }
                 }
             } else {
-                $cantidadMinima = $fila[$mapeo['cantidad_minima']] ?? 1;
-                $precioCrudo = $fila[$mapeo['precio']] ?? 0;
+                $cantidadMinima = $this->valor($fila, $mapeo, 'cantidad_minima', 1);
+                $precioCrudo    = $this->valor($fila, $mapeo, 'precio', 0);
                 $this->registrarPrecioYTramos($producto->id, $cantidadMinima, $precioCrudo, $reglas);
             }
 
-            if (isset($mapeo['pais_destino']) && isset($fila[$mapeo['pais_destino']])) {
+            $paisDestino = $this->valor($fila, $mapeo, 'pais_destino');
+            if ($paisDestino !== null) {
                 ProductoImpuesto::updateOrCreate(
                     [
                         'producto_id'  => $producto->id,
-                        'pais_destino' => $fila[$mapeo['pais_destino']]
+                        'pais_destino' => $paisDestino
                     ],
                     [
-                        'unidad_medida' => $fila[$mapeo['unidad_medida']] ?? $reglas['unidad_defecto'] ?? null,
+                        'unidad_medida' => $this->valor($fila, $mapeo, 'unidad_medida', $reglas['unidad_defecto'] ?? null),
                         'porcentaje'    => $reglas['porcentaje_impuesto'] ?? 0.00
                     ]
                 );
@@ -72,6 +72,15 @@ class ImportacionService
         });
     }
 
+
+    private function valor($fila, $mapeo, $campo, $default = null)
+    {
+        if (!isset($mapeo[$campo])) {
+            return $default;
+        }
+
+        return $fila[$mapeo[$campo]] ?? $default;
+    }
 
     private function registrarPrecioYTramos($productoId, $cantidadMinima, $precioCrudo, $reglas)
     {
