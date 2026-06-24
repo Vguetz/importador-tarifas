@@ -42,16 +42,14 @@ El endpoint de consulta tenía que aguantar miles de productos sin morir, así q
 Hice tests de integración, sobre todo para asegurarme de que un cambio en `ImportacionService` no rompa la importación sin que me dé cuenta. Me enfoqué en dos cosas:
 
 - Que un archivo se procese de punta a punta y quede bien guardado en la base.
-- Que la API de consulta filtre correctamente por marca y referencia.
-
+- Que la API de consulta filtre correctamente por marca y referencia
 No cubrí casos muy puntuales por una cuestión de tiempo, y preferí dejar sólido el flujo principal, que es el que se usa la mayor parte del tiempo.
 
 ## Mejoras pendientes
 
 Con más tiempo, seguiría por acá:
-
 - **Procesamiento en segundo plano.** Hoy, si el archivo es muy grande, el navegador queda esperando la respuesta del servidor. Lo ideal sería mover la importación a una Laravel Queue y avisarle al usuario cuando termina.
-- **Mapeo más flexible.** El array cumple para esta etapa, pero me gustaría pasar a un esquema que permita definir reglas por columna (limpiar strings, formatear fechas, convertir unidades) de forma centralizada y sin ensuciar el service.
+- **Mapeo más flexible.** El array cumple por ahora, pero me gustaría pasar a un esquema que permita definir reglas por columna (limpiar strings, formatear fechas, convertir unidades) de forma centralizada y sin ensuciar el service.
 - **Validación de esquema.** Por ahora confío en que el Excel trae las columnas esperadas. Estaría bueno validar la estructura apenas llega el archivo y devolver un error claro si no respeta el formato, antes de insertar nada.
 - **Búsqueda indexada.** Si el catálogo crece a millones de registros, las consultas con `WHERE` van a empezar a ser bastante mas lentas. Ahí integraría un motor de búsqueda indexado por atras, manteniendo el endpoint actual pero bajando los tiempos de respuesta.
 - **Mejor trazabilidad.** Que si falla una fila dentro de un archivo de 10.000, quede registrado el motivo exacto y el proceso continúe con el resto, en lugar de abortar por completo.
