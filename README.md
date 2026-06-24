@@ -27,7 +27,7 @@ Opté por un modelo relacional, principalmente para evitar datos duplicados. Que
 - **ProductoImpuestos**: lo separé para no mezclar los impuestos con la tabla de productos. De esta forma pueden variar según el país o la unidad sin afectar al resto.
 
 ## Decisiones de diseño
-
+![Diagrama de flujo de la importación](diagflu.png)
 Toda la lógica de importación quedó en `ImportacionService`. Preferí mantenerla ahí en lugar de cargar el controlador y terminar con algo difícil de mantener.
 
 Para el mapeo de columnas usé un array de configuración en `config/proveedores.php`. Para un sistema grande lo más prolijo sería una clase por proveedor, pero para el alcance de este challenge me pareció excesivo, y probablemente me quitaria demasiado tiempo. Teniendo todos los esquemas en un solo archivo es más fácil ver de un vistazo cómo viene cada proveedor y ajustarlo, en vez de repartir la lógica en muchos archivos casi vacíos.El service consume el array de forma transparente, así que si en algún momento un proveedor necesita una transformación más compleja (más allá de mapear columnas), se puede pasar ese caso a una clase propia sin reescribir toda la importación.
