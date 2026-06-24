@@ -13,6 +13,8 @@ Si lo querés probar por consola, hay un comando para eso:
 
 ```
 php artisan importar:excel {archivo} {codigo} {id}
+
+Ejemplo: php artisan importar:excel PROVEEDOR_A.xlsx lucgom_global 1   
 ```
 
 ## El modelo de datos
