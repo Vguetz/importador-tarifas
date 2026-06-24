@@ -2,7 +2,7 @@
 
 ## Cómo levantarlo
 
-Clonás el repo, entrás a la carpeta y de ahí:
+Clonar el repo, entrás a la carpeta y de ahí:
 
 - `composer install` para bajar las dependencias.
 - Copiás el `.env.example` a `.env` y completás los datos de la base.
