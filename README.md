@@ -33,9 +33,9 @@ Toda la lógica de importación quedó en `ImportacionService`. Preferí mantene
 
 Para el mapeo de columnas usé un array de configuración en `config/proveedores.php`. Para un sistema grande lo más prolijo sería una clase por proveedor, pero para el alcance de este challenge me pareció excesivo, y probablemente me quitaria demasiado tiempo. Teniendo todos los esquemas en un solo archivo es más fácil ver cómo viene cada proveedor y ajustarlo, en vez de repartir la lógica en muchos archivos casi vacíos.El service consume el array de forma transparente, así que si en algún momento un proveedor necesita una transformación más compleja, se puede pasar ese caso a una clase propia sin reescribir toda la importación.
 
-También cuidé la tolerancia a archivos incompletos. Usé `??` e `isset` en los puntos clave, porque los Excel de los proveedores rara vez vienen perfectos: suele faltar una columna o venir alguna celda vacía. Así un campo en blanco no corta todo el proceso.
+Otra cosa que tuve en cuenta es que los Excel de los proveedores casi nunca vienen prolijos, falta una columna, hay celdas vacías, ese tipo de cosas. Para que un dato faltante no tire abajo toda la importación, manejé los campos con ?? e isset, de forma que si algo no está, el producto se guarda igual con lo que sí vino.
 
-Por el lado de la performance, usé `with()` (eager loading) para no terminar con una consulta por cada producto, y `paginate(50)` para no intentar cargar miles de registros de una sola vez y saturar la memoria.
+El endpoint de consulta tenía que aguantar miles de productos sin morir, así que cuidé dos frentes. Con with() evité el N+1, ese agujero donde sin querer terminás haciendo una consulta por cada fila. Y con paginate(50) me aseguré de no traer todo el catálogo de un saque, que es la forma más rápida de tumbar la respuesta o reventar la memoria.
 
 ## Tests
 
