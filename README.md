@@ -19,7 +19,7 @@ Ejemplo: php artisan importar:excel PROVEEDOR_A.xlsx lucgom_global 1
 
 ## El modelo de datos
 
-Opté por un modelo relacional clásico, principalmente para evitar datos duplicados. Quedó dividido así:
+Opté por un modelo relacional, principalmente para evitar datos duplicados. Quedó dividido así:
 
 - **Proveedores**: el punto de entrada.
 - **Productos**: la información base, solo lo indispensable.
