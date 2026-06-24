@@ -60,24 +60,6 @@ class ImportadorController extends Controller
 
     public function importarWeb(Request $request)
     {
-        \Illuminate\Support\Facades\Log::info('--- NUEVO INTENTO DE SUBIDA ---');
-        \Illuminate\Support\Facades\Log::info('1. Carpeta temporal según PHP.INI: ' . ini_get('upload_tmp_dir'));
-        \Illuminate\Support\Facades\Log::info('2. Carpeta temporal del Sistema: ' . sys_get_temp_dir());
-    
-        if ($request->hasFile('archivo')) {
-            $archivo = $request->file('archivo');
-            \Illuminate\Support\Facades\Log::info('3. Archivo detectado: ' . $archivo->getClientOriginalName());
-            \Illuminate\Support\Facades\Log::info('4. Ruta donde PHP lo dejó: ' . $archivo->getRealPath());
-            \Illuminate\Support\Facades\Log::info('5. ¿Es válido?: ' . ($archivo->isValid() ? 'Sí' : 'No'));
-            \Illuminate\Support\Facades\Log::info('6. Código de error interno (0 es OK): ' . $archivo->getError());
-            
-            if (!$archivo->isValid()) {
-                \Illuminate\Support\Facades\Log::error('7. Motivo del fallo: ' . $archivo->getErrorMessage());
-            }
-        } else {
-            \Illuminate\Support\Facades\Log::warning('ATENCIÓN: El Request llegó pero sin el archivo adjunto.');
-        }
-    
         $request->validate([
             'archivo'          => 'required|file|mimes:xlsx,xls,csv|max:10240',
             'codigo_proveedor' => 'required|string',
@@ -85,32 +67,27 @@ class ImportadorController extends Controller
         ]);
     
         try {
-            
             $directorio = storage_path('app/uploads');
-            
-         
+    
             if (!file_exists($directorio)) {
                 mkdir($directorio, 0777, true);
             }
-        
-            
+    
             $nombreArchivo = time() . '_' . $request->file('archivo')->getClientOriginalName();
             $archivoMovido = $request->file('archivo')->move($directorio, $nombreArchivo);
-        
-           
+    
             $this->importacionService->procesarArchivo(
                 $archivoMovido->getRealPath(),
                 $request->input('codigo_proveedor'),
                 $request->input('proveedor_id')
             );
-        
-            
+    
             @unlink($archivoMovido->getRealPath());
-        
+    
             return redirect()->back()->with('success', '¡Importación finalizada con éxito!');
-        
+    
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error($e->getMessage());
+            Log::error($e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
         }
     }

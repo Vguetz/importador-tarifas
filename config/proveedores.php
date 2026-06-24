@@ -40,4 +40,16 @@ return [
             'impuestos_incluidos' => false
         ]
     ],
+
+    'proveedor_c' => [
+    'nombre' => 'Global Logistics C',
+    'columnas' => [
+        'marca' => 'Brand_Name',
+        'referencia' => 'SKU_ID',
+        'ean' => 'EAN_Code',
+        'descripcion' => 'Product_Desc',
+        'dimensiones' => 'Size_Specs',
+        'precio' => 'Base_Price', 
+    ],
+],
 ];
