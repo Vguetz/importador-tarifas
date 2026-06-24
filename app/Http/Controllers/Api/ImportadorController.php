@@ -63,11 +63,11 @@ class ImportadorController extends Controller
     {
         $request->validate([
             'archivo'          => 'required|file|mimes:xlsx,xls,csv|max:10240',
-            'codigo_proveedor' => 'required|string',
             'proveedor_id'     => 'required|integer|exists:proveedores,id'
         ]);
 
         try {
+            $proveedor = Proveedor::findOrFail($request->input('proveedor_id'));
             $directorio = storage_path('app/uploads');
 
             if (!file_exists($directorio)) {
@@ -79,7 +79,7 @@ class ImportadorController extends Controller
 
             $this->importacionService->procesarArchivo(
                 $archivoMovido->getRealPath(),
-                $request->input('codigo_proveedor'),
+                $proveedor->codigo,
                 $request->input('proveedor_id')
             );
 
