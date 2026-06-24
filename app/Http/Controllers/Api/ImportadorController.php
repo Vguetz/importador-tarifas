@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\ImportacionService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Models\Proveedor;
 
 class ImportadorController extends Controller
 {
@@ -17,7 +18,7 @@ class ImportadorController extends Controller
         $this->importacionService = $importacionService;
     }
 
-    public function importar(Request $request)  
+    public function importar(Request $request)
     {
         $request->validate([
             'archivo'          => 'required|file|mimes:xlsx,xls,csv|max:10240',
@@ -30,7 +31,7 @@ class ImportadorController extends Controller
             $rutaTemporal = $archivo->store('temp');
             $rutaAbsoluta = $request->file('archivo')->getRealPath();
 
-           
+
             $this->importacionService->procesarArchivo(
                 $rutaAbsoluta,
                 $request->input('codigo_proveedor'),
@@ -65,27 +66,26 @@ class ImportadorController extends Controller
             'codigo_proveedor' => 'required|string',
             'proveedor_id'     => 'required|integer|exists:proveedores,id'
         ]);
-    
+
         try {
             $directorio = storage_path('app/uploads');
-    
+
             if (!file_exists($directorio)) {
                 mkdir($directorio, 0777, true);
             }
-    
+
             $nombreArchivo = time() . '_' . $request->file('archivo')->getClientOriginalName();
             $archivoMovido = $request->file('archivo')->move($directorio, $nombreArchivo);
-    
+
             $this->importacionService->procesarArchivo(
                 $archivoMovido->getRealPath(),
                 $request->input('codigo_proveedor'),
                 $request->input('proveedor_id')
             );
-    
+
             @unlink($archivoMovido->getRealPath());
-    
+
             return redirect()->back()->with('success', '¡Importación finalizada con éxito!');
-    
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Error: ' . $e->getMessage()]);
@@ -109,4 +109,11 @@ class ImportadorController extends Controller
         return response()->json($productos);
     }
 
+    public function mostrarFormulario()
+    {
+        return view('importar', [
+            'proveedores' => Proveedor::orderBy('nombre')->get(),
+            'codigos'     => array_keys(config('proveedores')),
+        ]);
+    }
 }

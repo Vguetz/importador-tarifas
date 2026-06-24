@@ -25,18 +25,18 @@
         @csrf
 
         <div>
-            <label for="proveedor_id">ID del Proveedor:</label>
-            <input type="number" name="proveedor_id" id="proveedor_id" value="1" required>
-        </div>
-        <br>
-
-        <div>
-            <label for="codigo_proveedor">Código de Configuración:</label>
-            <select name="codigo_proveedor" id="codigo_proveedor" required>
-                <option value="lucgom_global">LucGomGlobal (lucgom_global)</option>
-                <option value="industrial_parts">IndustrialParts (industrial_parts)</option>
-                <option value="proveedor_c">Global Logistics C (proveedor_c)</option>
+            <label for="proveedor_id">Proveedor:</label>
+            @if($proveedores->isEmpty())
+            <p style="color: red;">
+                No hay proveedores cargados. Corré <code>php artisan db:seed</code> antes de importar.
+            </p>
+            @else
+            <select name="proveedor_id" id="proveedor_id" required>
+                @foreach($proveedores as $proveedor)
+                <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
+                @endforeach
             </select>
+            @endif
         </div>
         <br>
 

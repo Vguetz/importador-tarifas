@@ -2,6 +2,7 @@
 
 return [
     'lucgom_global' => [
+        'nombre' => 'LucGomGlobal',
         'columnas' => [
             'referencia'  => 'REF',
             'marca'       => 'Brand',
@@ -23,6 +24,7 @@ return [
     ],
 
 'industrial_parts' => [ 
+    'nombre' => 'Componentes Industriales S.A.',
         'columnas' => [
             'referencia'      => 'Part Number',
             'marca'           => 'Manufacturer',
