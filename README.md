@@ -26,12 +26,18 @@ Opté por un modelo relacional, principalmente para evitar datos duplicados. Que
 - **ProductoPrecios**: los precios por volumen. Es una relación 1:N, así que cada producto puede tener todos los tramos que necesite.
 - **ProductoImpuestos**: lo separé para no mezclar los impuestos con la tabla de productos. De esta forma pueden variar según el país o la unidad sin afectar al resto.
 
+Pensé en guardar los precios y los impuestos como JSON dentro de la misma tabla de productos, que hubiera sido más rápido de armar. Lo descarté porque después consultarlos se vuelve incómodo, filtrar por tramo de precio o por país de destino sobre un campo JSON es mucho más torpe que sobre tablas propias, y justo la consulta es una de las cosas que el sistema tiene que hacer bien. Separarlos en ProductoPrecios y ProductoImpuestos cuesta un poco más al principio pero deja todo consultable con queries normales.
+
 ## Decisiones de diseño
 ![Diagrama de flujo de la importación](diagflu.png)
 
 Toda la lógica de importación quedó en `ImportacionService`. Preferí mantenerla ahí en lugar de cargar el controlador y terminar con algo difícil de mantener.
 
 Para el mapeo de columnas usé un array de configuración en `config/proveedores.php`. Para un sistema grande lo más prolijo sería una clase por proveedor, pero para el alcance de este challenge me pareció excesivo, y probablemente me quitaria demasiado tiempo. Teniendo todos los esquemas en un solo archivo es más fácil ver cómo viene cada proveedor y ajustarlo, en vez de repartir la lógica en muchos archivos casi vacíos.El service consume el array de forma transparente, así que si en algún momento un proveedor necesita una transformación más compleja, se puede pasar ese caso a una clase propia sin reescribir toda la importación.
+
+La alternativa que tenía en la cabeza era una clase por proveedor implementando una interfaz común, que es lo más correcto cuando cada uno necesita lógica propia. Para lo que pide este challenge habría sido un montón de archivos para muy poca lógica real, así que lo dejé planteado como el camino al que migrar si la cosa se complica.
+
+Para leer los Excel usé FastExcel en vez de PhpSpreadsheet directo. PhpSpreadsheet te da control total sobre el archivo (estilos, fórmulas, todo), pero acá no me interesa nada de eso, solo leer filas. FastExcel va por arriba de PhpSpreadsheet pero con una API más simple para justamente esto, y maneja mejor los archivos grandes sin cargarlos enteros en memoria.
 
 Otra cosa que tuve en cuenta es que los Excel de los proveedores casi nunca vienen prolijos, falta una columna, hay celdas vacías, ese tipo de cosas. Para que un dato faltante no tire abajo toda la importación, manejé los campos con ?? e isset, de forma que si algo no está, el producto se guarda igual con lo que sí vino.
 
