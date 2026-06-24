@@ -28,7 +28,7 @@
             <label for="proveedor_id">Proveedor:</label>
             @if($proveedores->isEmpty())
             <p style="color: red;">
-                No hay proveedores cargados. Corré <code>php artisan db:seed</code> antes de importar.
+                no tenes proveedores cargados en la base de datos. corre el comando <code>php artisan db:seed</code> antes de importar.
             </p>
             @else
             <select name="proveedor_id" id="proveedor_id" required>
