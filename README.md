@@ -60,3 +60,11 @@ Con más tiempo, seguiría por acá:
 - **Búsqueda indexada.** Si el catálogo crece a millones de registros, las consultas con `WHERE` van a empezar a ser bastante mas lentas. Ahí integraría un motor de búsqueda indexado por atras, manteniendo el endpoint actual pero bajando los tiempos de respuesta.
 - **Mejor trazabilidad.** Que si falla una fila dentro de un archivo de 10.000, quede registrado el motivo exacto y el proceso continúe con el resto, en lugar de abortar por completo.
 - **Alta automática de proveedores en la importación.**. Hoy el proveedor tiene que existir antes de importar (se pasa su id y se valida contra la base). Me hubiera gustado que la importación pudiera crear el proveedor automáticamente si no existe, derivándolo del código de configuración, de forma que dar de alta un proveedor nuevo fuera simplemente agregar su bloque al config y tirar el Excel, sin pasos manuales previos. No lo incluí porque, en un escenario real, el alta de un proveedor suele ser un acto deliberado con más datos asociados y conviene separarla del flujo de importación, resolver bien ese equilibrio hubiese requerido mas tiempo.
+
+## Supuestos que tomé
+
+El enunciado deja algunas cosas abiertas, así que dejo anotado lo que interpreté en cada caso.
+
+Familia y subfamilia las terminé tratando como opcionales. El enunciado no las marca así (sí marca EAN y descripción), pero después me encontré con archivos de ejemplo que directamente no las traen. Entre rechazar esa importación o dejar pasar el producto con esos campos en `null`, me quedé con lo segundo. Frenar una carga entera por un dato que el proveedor ni maneja me pareció peor que guardarla incompleta.
+
+Con las unidades hice una simplificación. El contexto deja entrever que algún proveedor mete la unidad en el nombre de la columna (un `Peso (kg)`, por ejemplo), pero yo asumí que viene siempre en su propia columna o definida en las reglas del proveedor. Sacarla del encabezado se podría hacer sin tocar la estructura, sería una regla de mapeo más, pero para esta entrega lo dejé afuera.
